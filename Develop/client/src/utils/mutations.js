@@ -1,18 +1,37 @@
 import { gql } from '@apollo/client';
 
 export const LOGIN_USER = gql`
-  mutation 
+  mutation login() {
+      login() {
+          token
+          user {
+
+          }
+      }
+  }
 `;
 
 export const ADD_USER = gql`
-  mutation 
+   mutation createUser() {
+      createUser() {
+          token
+          user {
+              
+          }
+      }
+  }
 `;
 
 export const SAVE_BOOK = gql`
-  mutation 
+mutation saveBook() {
+    saveBook() {
+    }
+}
 `;
 
 export const REMOVE_BOOK = gql`
-  mutation 
+mutation removeBook() {
+    removeBook() {
+    }
+}
 `;
-
