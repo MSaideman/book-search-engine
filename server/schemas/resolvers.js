@@ -7,7 +7,7 @@ const { signToken } = require('../utils/auth');
 const resolvers = {
   Query: {
     me: async (parent, args, context) => {
-      const foundUser = await User.findOne({_id: context.user._id})
+      const foundUser = await User.findOne({_id: context.user._id}).populate("savedBooks")
       if (!foundUser) {
         throw new AuthenticationError('Cannot find a user with this id!');
       }
@@ -34,28 +34,23 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
-    saveBook: async (parent, { authors, description, title, bookId, image, link}, context) => {
-      console.log(authors, description, title, bookId, image, link);
-      console.log(context.user._id)
 
-      // if(context.user._id)
-      try {
-          const updatedUser = await User.findOneAndUpdate(
-            { _id: context.user._id },
-            { $push: { savedBooks: {authors, description, title, bookId, image, link} } },
-            { new: true, runValidators: true }
-          );
+    saveBook: async (parent, { authors, description, title, bookId, image}, context) => {
+
+      if(context.user._id) {
+        const updatedUser = await User.findOneAndUpdate(  
+          { _id: context.user._id },
+          { $push: { savedBooks: {authors, description, title, bookId, image} } },
+          { new: true, runValidators: true })
           return updatedUser;
-        } catch (err) {
-          console.log(err);
-          return;
         }
+        throw new AuthenticationError('Wrong password!')
     },
-    
-    removeBook: async (parent, { user, params }, context) => {
+
+    removeBook: async (parent, {bookId}, context) => {
       const updatedUser = await User.findOneAndUpdate(
         { _id: context.user._id },
-        { $pull: { savedBooks: { bookId: params.bookId } } },
+        { $pull: { savedBooks: { bookId } } },
         { new: true }
       );
       if (!updatedUser) {
